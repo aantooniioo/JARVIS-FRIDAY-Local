@@ -120,7 +120,7 @@ class LocalJARVIS:
                 # Comandos simples
                 # 1. Salir / terminar
                 if any(cmd in text for cmd in ["salir", "adiós", "terminar"]):
-                    self.speak("Hasta luego")
+                    self.speak("Hasta luego, señor.")
                     break
                 # 2. Hora
                 elif "hora" in text:
@@ -129,7 +129,7 @@ class LocalJARVIS:
                     self.speak(response)
                 # 3. Saludo
                 elif "hola friday" in text:
-                    response = "Hola Señor, estoy activa."
+                    response = "A sus órdenes, señor."
                     self.speak(response)
                 # 4. Ayuda de comandos
                 elif "qué puedes hacer" in text:
