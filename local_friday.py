@@ -6,6 +6,8 @@ Usa Ollama + speech recognition + pyttsx3
 import os
 import sys
 import time
+import webbrowser
+import subprocess
 from pathlib import Path
 
 # Agregar Friday al path
@@ -133,9 +135,111 @@ class LocalJARVIS:
                     self.speak(response)
                 # 4. Ayuda de comandos
                 elif "qué puedes hacer" in text:
-                    response = "Comandos disponibles: 'hora' para la hora, 'hola Friday' para saludar, 'qué puedes hacer' para esta guía, 'salir' / 'adiós' / 'terminar' para cerrar. Otras consultas usarán el modelo local si está disponible."
+                    response = ("Comandos disponibles: "
+                        "'hora' para la hora, "
+                        "'qué día es' / 'fecha' para la fecha, "
+                        "'hola Friday' para saludar, "
+                        "'buenos días' / 'buenas tardes' / 'buenas noches' / 'gracias' / 'cómo estás' para cortesía, "
+                        "'quién eres' / 'qué eres' para identidad, "
+                        "'abre Chrome' / 'abre VS Code' / 'abre Spotify' para aplicaciones, "
+                        "'abre YouTube' / 'abre Google' / 'abre GitHub' / 'abre ChatGPT' para webs, "
+                        "'qué puedes hacer' para esta guía, "
+                        "'salir' / 'adiós' / 'terminar' para cerrar. "
+                        "Otras consultas usarán el modelo local si está disponible.")
                     self.speak(response)
-                # 5. Ollama (solo si no es comando básico)
+                # 5. Fecha y día
+                elif any(cmd in text for cmd in ["qué día es", "fecha"]):
+                    today = datetime.now()
+                    days_es = {
+                        0: "lunes",
+                        1: "martes",
+                        2: "miércoles",
+                        3: "jueves",
+                        4: "viernes",
+                        5: "sábado",
+                        6: "domingo"
+                    }
+                    months_es = {
+                        1: "enero",
+                        2: "febrero",
+                        3: "marzo",
+                        4: "abril",
+                        5: "mayo",
+                        6: "junio",
+                        7: "julio",
+                        8: "agosto",
+                        9: "septiembre",
+                        10: "octubre",
+                        11: "noviembre",
+                        12: "diciembre"
+                    }
+                    day_name = days_es[today.weekday()]
+                    month_name = months_es[today.month]
+                    response = f"Hoy es {day_name}, {today.day} de {month_name} de {today.year}."
+                    self.speak(response)
+                # 6. Saludos y cortesía
+                elif "buenos días" in text:
+                    response = "Buenos días, señor."
+                    self.speak(response)
+                elif "buenas tardes" in text:
+                    response = "Buenas tardes, señor."
+                    self.speak(response)
+                elif "buenas noches" in text:
+                    response = "Buenas noches, señor."
+                    self.speak(response)
+                elif "gracias" in text:
+                    response = "Siempre a sus órdenes, señor."
+                    self.speak(response)
+                elif "cómo estás" in text:
+                    response = "Operativa y lista para asistirle, señor."
+                    self.speak(response)
+                # 7. Identidad
+                elif "quién eres" in text:
+                    response = "Soy Fraidey, su asistente local."
+                    self.speak(response)
+                elif "qué eres" in text:
+                    response = "Soy una interfaz de asistencia local inspirada en Fraidey."
+                    self.speak(response)
+                # 8. Abrir aplicaciones
+                elif "abre chrome" in text:
+                    try:
+                        subprocess.Popen(r"C:\Program Files\Google\Chrome\Application\chrome.exe")
+                        response = "Abriendo Chrome, señor."
+                    except Exception:
+                        response = "No pude abrir Chrome, señor."
+                    self.speak(response)
+                elif any(cmd in text for cmd in ["abre vs code", "abre visual studio code"]):
+                    try:
+                        subprocess.Popen("code")
+                        response = "Abriendo Visual Studio Code, señor."
+                    except Exception:
+                        response = "No pude abrir Visual Studio Code, señor."
+                    self.speak(response)
+                elif "abre spotify" in text:
+                    try:
+                        subprocess.Popen(r"C:\Users\anton\AppData\Roaming\Spotify\Spotify.exe")
+                        response = "Abriendo Spotify, señor."
+                    except Exception:
+                        response = "No pude abrir Spotify, señor."
+                    self.speak(response)
+                # 9. Abrir webs
+                elif "abre youtube" in text:
+                    webbrowser.open("https://youtube.com")
+                    response = "Abriendo YouTube, señor."
+                    self.speak(response)
+                elif "abre google" in text:
+                    webbrowser.open("https://google.com")
+                    response = "Abriendo Google, señor."
+                    self.speak(response)
+                elif "abre github" in text:
+                    webbrowser.open("https://github.com")
+                    response = "Abriendo GitHub, señor."
+                    self.speak(response)
+                elif "abre chatgpt" in text:
+                    webbrowser.open("https://chatgpt.com")
+                    response = "Abriendo ChatGPT, señor."
+                    self.speak(response)
+                # 10. Ollama (solo si no es comando básico)
                 else:
                     response = self.query_ollama(text)
                     self.speak(response)
