@@ -47,7 +47,7 @@ class LocalJARVIS:
         
         self.speak("Friday inicializado")
     
-    def speak(self, text: str):
+    def speak(self, text: str, voice_text: str = None):
         """Habla usando edge-tts"""
         if not text:
             return
@@ -55,7 +55,7 @@ class LocalJARVIS:
         print(f"[FRIDAY] {text}\n")  # Consola: texto original
 
         # Texto para voz: ajustar pronunciaciones
-        spoken_text = text
+        spoken_text = voice_text if voice_text is not None else text
         spoken_text = spoken_text.replace("JARVIS", "Yarvis")
         spoken_text = spoken_text.replace("F.R.I.D.A.Y.", "Fraidey")
         spoken_text = spoken_text.replace("Friday", "Fraidey")
@@ -358,8 +358,9 @@ class LocalJARVIS:
                         encoded_query = urllib.parse.quote_plus(query)
                         search_url = f"https://www.youtube.com/results?search_query={encoded_query}"
                         webbrowser.open(search_url)
-                        response = "Buscando en YouTube, señor."
-                    self.speak(response)
+                        console_response = f"Buscando {query} en YouTube, señor."
+                        voice_response = "Buscando en YouTube, señor."
+                        self.speak(console_response, voice_text=voice_response)
                 # 11. Abrir carpetas locales
                 elif "abre escritorio" in text:
                     path = r"C:\Users\anton\Desktop"
