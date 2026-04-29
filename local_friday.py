@@ -7,13 +7,23 @@ import os
 import sys
 import time
 import json
+import unicodedata
 import urllib.parse
 import webbrowser
 import subprocess
 from pathlib import Path
 
-# Agregar Friday al path
-sys.path.insert(0, str(Path(__file__).parent))
+
+def normalize_text(text):
+    """Normaliza texto: minúsculas, sin acentos"""
+    if not text:
+        return ""
+    text = text.lower()
+    # Descomponer caracteres acentuados y eliminar marcas no espaciadas
+    normalized = unicodedata.normalize('NFD', text)
+    text = ''.join(c for c in normalized if unicodedata.category(c) != 'Mn')
+    return text
+
 
 import speech_recognition as sr
 
@@ -157,6 +167,8 @@ class LocalJARVIS:
                 if not text:
                     continue
                 
+                norm_text = normalize_text(text)
+                
                 # Comandos simples
                 # 1. Salir / terminar
                 if any(cmd in text for cmd in ["salir", "adiós", "terminar"]):
@@ -284,21 +296,69 @@ class LocalJARVIS:
                     response = "Abriendo ChatGPT, señor."
                     self.speak(response)
                 # 10. Buscar música en YouTube
-                elif "busca música de" in text or ("busca" in text and "en youtube" in text):
-                    # Extraer consulta
-                    if "busca música de" in text:
-                        query = text.split("busca música de", 1)[1].strip()
-                    else:
-                        # "busca [query] en YouTube"
-                        query_part = text.split("busca", 1)[1].split("en youtube", 1)[0].strip()
-                        query = query_part
+                elif (
+                    any(prefix in norm_text for prefix in ["busca musica de ", "pon musica de ", "buscame musica de ", "musica de ", "busca musica del ", "pon musica del ", "buscame musica del ", "musica del "])
+                    or "en youtube" in norm_text
+                ):
+                    query = ""
+                    # Caso 1: Frases con "busca/pon/buscame musica de " o "del "
+                    if "busca musica de " in norm_text:
+                        query = norm_text.split("busca musica de ", 1)[1].strip()
+                    elif "pon musica de " in norm_text:
+                        query = norm_text.split("pon musica de ", 1)[1].strip()
+                    elif "buscame musica de " in norm_text:
+                        query = norm_text.split("buscame musica de ", 1)[1].strip()
+                    elif "musica de " in norm_text:
+                        query = norm_text.split("musica de ", 1)[1].strip()
+                    elif "busca musica del " in norm_text:
+                        query = norm_text.split("busca musica del ", 1)[1].strip()
+                    elif "pon musica del " in norm_text:
+                        query = norm_text.split("pon musica del ", 1)[1].strip()
+                    elif "buscame musica del " in norm_text:
+                        query = norm_text.split("buscame musica del ", 1)[1].strip()
+                    elif "musica del " in norm_text:
+                        query = norm_text.split("musica del ", 1)[1].strip()
+                    # Caso 2: Contiene "en youtube"
+                    elif "en youtube" in norm_text:
+                        pre_youtube = norm_text.split("en youtube", 1)[0].strip()
+                        # Quitar prefijos
+                        prefixes = ["busca ", "busco ", "pon ", "buscame "]
+                        for prefix in prefixes:
+                            if pre_youtube.startswith(prefix):
+                                pre_youtube = pre_youtube[len(prefix):].strip()
+                                break
+                        query = pre_youtube
+                    
                     if not query:
                         response = "No has especificado qué buscar, señor."
                     else:
+                        # Corregir nombres mal reconocidos
+                        youtube_aliases = {
+                            "central": "central cee",
+                            "central si": "central cee",
+                            "central sí": "central cee",
+                            "central c": "central cee",
+                            "beny": "beny jr",
+                            "beni jr": "beny jr",
+                            "beny junior": "beny jr",
+                            "grind": "grind",
+                            # Nuevos aliases para "del"
+                            "ben": "beny jr",
+                            "beni": "beny jr",
+                            "el ben": "beny jr",
+                            "del ben": "beny jr",
+                            "green": "grind",
+                            "grin": "grind",
+                            "el grind": "grind",
+                            "del grind": "grind",
+                        }
+                        if query in youtube_aliases:
+                            query = youtube_aliases[query]
+                        
                         encoded_query = urllib.parse.quote_plus(query)
                         search_url = f"https://www.youtube.com/results?search_query={encoded_query}"
                         webbrowser.open(search_url)
-                        response = f"Buscando {query} en YouTube, señor."
+                        response = "Buscando en YouTube, señor."
                     self.speak(response)
                 # 11. Abrir carpetas locales
                 elif "abre escritorio" in text:
