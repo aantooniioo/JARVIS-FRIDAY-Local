@@ -6,6 +6,7 @@ Usa Ollama + speech recognition + pyttsx3
 import os
 import sys
 import time
+import json
 import webbrowser
 import subprocess
 from pathlib import Path
@@ -26,6 +27,7 @@ class LocalJARVIS:
         print("="*70 + "\n")
         
         self.listener = sr.Recognizer()
+        self.memory_file = "friday_memory.json"
 
         
         print("[INIT] Componentes cargados")
@@ -110,6 +112,35 @@ class LocalJARVIS:
             print(f"[ERROR] Ollama: {e}\n")
             return "Ahora mismo no puedo usar el modelo local, pero sigo disponible para comandos básicos como la hora."
     
+    def load_memory(self):
+        """Carga recuerdos desde el archivo JSON"""
+        try:
+            with open(self.memory_file, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except FileNotFoundError:
+            return []
+        except Exception as e:
+            print(f"[ERROR MEMORIA] Error cargando memoria: {e}")
+            return []
+
+    def save_memory(self, memory_list):
+        """Guarda recuerdos en el archivo JSON"""
+        try:
+            with open(self.memory_file, 'w', encoding='utf-8') as f:
+                json.dump(memory_list, f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            print(f"[ERROR MEMORIA] Error guardando memoria: {e}")
+
+    def add_memory(self, text):
+        """Añade un nuevo recuerdo"""
+        memory = self.load_memory()
+        memory.append(text)
+        self.save_memory(memory)
+
+    def clear_memory(self):
+        """Limpia todos los recuerdos"""
+        self.save_memory([])
+    
     def run(self):
         """Loop principal"""
         while True:
@@ -143,6 +174,9 @@ class LocalJARVIS:
                         "'quién eres' / 'qué eres' para identidad, "
                         "'abre Chrome' / 'abre VS Code' / 'abre Spotify' para aplicaciones, "
                         "'abre YouTube' / 'abre Google' / 'abre GitHub' / 'abre ChatGPT' para webs, "
+                        "'recuerda que [texto]' para guardar recuerdos, "
+                        "'qué recuerdas' para leer recuerdos, "
+                        "'borra recuerdos' / 'limpia memoria' para limpiar memoria, "
                         "'qué puedes hacer' para esta guía, "
                         "'salir' / 'adiós' / 'terminar' para cerrar. "
                         "Otras consultas usarán el modelo local si está disponible.")
@@ -239,7 +273,29 @@ class LocalJARVIS:
                     webbrowser.open("https://chatgpt.com")
                     response = "Abriendo ChatGPT, señor."
                     self.speak(response)
-                # 10. Ollama (solo si no es comando básico)
+                # 10. Guardar recuerdo
+                elif "recuerda que" in text:
+                    memory_text = text.split("recuerda que", 1)[1].strip()
+                    if memory_text:
+                        self.add_memory(memory_text)
+                        response = "Lo recordaré, señor."
+                    else:
+                        response = "No has especificado qué recordar, señor."
+                    self.speak(response)
+                # 11. Leer recuerdos
+                elif "qué recuerdas" in text:
+                    memory = self.load_memory()
+                    if memory:
+                        response = "Recuerdos: " + ", ".join([f"{i+1}. {item}" for i, item in enumerate(memory)])
+                    else:
+                        response = "No tengo recuerdos guardados, señor."
+                    self.speak(response)
+                # 12. Borrar recuerdos
+                elif any(cmd in text for cmd in ["borra recuerdos", "limpia memoria"]):
+                    self.clear_memory()
+                    response = "Memoria local limpiada, señor."
+                    self.speak(response)
+                # 13. Ollama (solo si no es comando básico)
                 else:
                     response = self.query_ollama(text)
                     self.speak(response)
