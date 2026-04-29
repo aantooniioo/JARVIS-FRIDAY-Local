@@ -7,6 +7,7 @@ import os
 import sys
 import time
 import json
+import urllib.parse
 import webbrowser
 import subprocess
 from pathlib import Path
@@ -41,7 +42,13 @@ class LocalJARVIS:
         if not text:
             return
 
-        print(f"[FRIDAY] {text}\n")
+        print(f"[FRIDAY] {text}\n")  # Consola: texto original
+
+        # Texto para voz: ajustar pronunciaciones
+        spoken_text = text
+        spoken_text = spoken_text.replace("JARVIS", "Yarvis")
+        spoken_text = spoken_text.replace("F.R.I.D.A.Y.", "Fraidey")
+        spoken_text = spoken_text.replace("Friday", "Fraidey")
 
         try:
             import edge_tts
@@ -50,8 +57,8 @@ class LocalJARVIS:
             import os
             from playsound import playsound
 
-            async def _speak(text):
-                communicate = edge_tts.Communicate(text, voice="es-ES-ElviraNeural")
+            async def _speak(spoken_text):
+                communicate = edge_tts.Communicate(spoken_text, voice="es-ES-ElviraNeural")
                 with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as f:
                     tmpfile = f.name
                 try:
@@ -60,7 +67,7 @@ class LocalJARVIS:
                 finally:
                     os.unlink(tmpfile)
 
-            asyncio.run(_speak(text))
+            asyncio.run(_speak(spoken_text))
         except Exception as e:
             print(f"[ERROR VOZ] Fallo al hablar: {e}")
     
@@ -174,6 +181,9 @@ class LocalJARVIS:
                         "'quién eres' / 'qué eres' para identidad, "
                         "'abre Chrome' / 'abre VS Code' / 'abre Spotify' para aplicaciones, "
                         "'abre YouTube' / 'abre Google' / 'abre GitHub' / 'abre ChatGPT' para webs, "
+                        "'abre escritorio' / 'abre descargas' / 'abre documentos' para carpetas, "
+                        "'abre mi proyecto' / 'abre JARVIS' para abrir el proyecto local, "
+                        "'busca música de [canción]' / 'busca [algo] en YouTube' para buscar música en YouTube, "
                         "'recuerda que [texto]' para guardar recuerdos, "
                         "'qué recuerdas' para leer recuerdos, "
                         "'borra recuerdos' / 'limpia memoria' para limpiar memoria, "
@@ -273,7 +283,57 @@ class LocalJARVIS:
                     webbrowser.open("https://chatgpt.com")
                     response = "Abriendo ChatGPT, señor."
                     self.speak(response)
-                # 10. Guardar recuerdo
+                # 10. Buscar música en YouTube
+                elif "busca música de" in text or ("busca" in text and "en youtube" in text):
+                    # Extraer consulta
+                    if "busca música de" in text:
+                        query = text.split("busca música de", 1)[1].strip()
+                    else:
+                        # "busca [query] en YouTube"
+                        query_part = text.split("busca", 1)[1].split("en youtube", 1)[0].strip()
+                        query = query_part
+                    if not query:
+                        response = "No has especificado qué buscar, señor."
+                    else:
+                        encoded_query = urllib.parse.quote_plus(query)
+                        search_url = f"https://www.youtube.com/results?search_query={encoded_query}"
+                        webbrowser.open(search_url)
+                        response = f"Buscando {query} en YouTube, señor."
+                    self.speak(response)
+                # 11. Abrir carpetas locales
+                elif "abre escritorio" in text:
+                    path = r"C:\Users\anton\Desktop"
+                    if os.path.exists(path):
+                        os.startfile(path)
+                        response = "Abriendo escritorio, señor."
+                    else:
+                        response = "No he encontrado esa carpeta, señor."
+                    self.speak(response)
+                elif "abre descargas" in text:
+                    path = r"C:\Users\anton\Downloads"
+                    if os.path.exists(path):
+                        os.startfile(path)
+                        response = "Abriendo descargas, señor."
+                    else:
+                        response = "No he encontrado esa carpeta, señor."
+                    self.speak(response)
+                elif "abre documentos" in text:
+                    path = r"C:\Users\anton\Documents"
+                    if os.path.exists(path):
+                        os.startfile(path)
+                        response = "Abriendo documentos, señor."
+                    else:
+                        response = "No he encontrado esa carpeta, señor."
+                    self.speak(response)
+                elif any(cmd in text for cmd in ["abre mi proyecto", "abre mi proyecto jarvis", "abre proyecto jarvis", "abre jarvis"]):
+                    path = r"C:\Users\anton\Desktop\J.A.R.V.I.S"
+                    if os.path.exists(path):
+                        os.startfile(path)
+                        response = "Abriendo el proyecto JARVIS, señor."
+                    else:
+                        response = "No he encontrado esa carpeta, señor."
+                    self.speak(response)
+                # 11. Guardar recuerdo
                 elif "recuerda que" in text:
                     memory_text = text.split("recuerda que", 1)[1].strip()
                     if memory_text:
