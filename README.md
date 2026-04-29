@@ -1,120 +1,120 @@
-# J.A.R.V.I.S. / F.R.I.D.A.Y. — Local Voice Assistant
+# J.A.R.V.I.S. / F.R.I.D.A.Y. — Asistente de Voz Local
 
 > *"Fully Responsive Intelligent Digital Assistant for You"*
 
-A Tony Stark-inspired local voice assistant that runs on your Windows PC, with no heavy AI models required for basic functionality.
+Un asistente de voz local inspirado en Tony Stark que funciona en tu PC con Windows, sin necesidad de modelos de IA pesados para funcionalidades básicas.
 
 ---
 
-## Current Version: Local Friday (Stable)
+## Versión Actual: Friday Local (Estable)
 
-This is the active, stable version of the assistant. It works without Ollama or cloud APIs for basic commands, using:
-- **SpeechRecognition** (Google Speech API) for voice input (requires internet)
-- **edge-tts** (Microsoft Edge TTS) for voice output (requires internet)
-- **playsound** for audio playback
-- Basic built-in commands (no heavy LLM required)
+Esta es la versión activa y estable del asistente. Funciona sin Ollama ni APIs de pago para los comandos básicos, utilizando:
+- **SpeechRecognition** (API de Google Speech) para entrada de voz (requiere internet)
+- **edge-tts** (Microsoft Edge TTS) para salida de voz (requiere internet)
+- **playsound** para reproducción de audio
+- Comandos básicos integrados (no requiere LLM pesado)
 
-*Note: This version is not 100% offline, as both speech recognition and text-to-speech require an internet connection.*
+*Nota: Esta versión no es 100% offline, ya que tanto el reconocimiento de voz como la síntesis de voz requieren conexión a internet.*
 
 ---
 
-## Features (Local Version)
+## Características (Versión Local)
 
-### Basic Voice Commands
-| Command | Response |
+### Comandos de Voz Disponibles
+| Comando | Respuesta |
 |---------|-----------|
 | `hola Friday` | "A sus órdenes, señor." |
-| `hora` | "Son las [H] y [M]" (e.g., "Son las 13 y 27") |
-| `qué día es` / `fecha` | "Hoy es [día], [día] de [mes] de [año]." (e.g., "Hoy es martes, 28 de abril de 2026.") |
+| `hora` | "Son las [H] y [M]" (ej: "Son las 13 y 27") |
+| `qué día es` / `fecha` | "Hoy es [día], [día] de [mes] de [año]." (ej: "Hoy es martes, 28 de abril de 2026.") |
 | `buenos días` / `buenas tardes` / `buenas noches` | "Buenos días/tardes/noches, señor." |
 | `gracias` | "Siempre a sus órdenes, señor." |
 | `cómo estás` | "Operativa y lista para asistirle, señor." |
 | `quién eres` | "Soy Fraidey, su asistente local." |
 | `qué eres` | "Soy una interfaz de asistencia local inspirada en Fraidey." |
-| `qué puedes hacer` | Lists all available commands |
-| `abre Chrome` | Opens Google Chrome (if installed) |
-| `abre VS Code` / `abre Visual Studio Code` | Opens VS Code (if installed) |
-| `abre Spotify` | Opens Spotify (if installed) |
-| `abre YouTube` / `abre Google` / `abre GitHub` / `abre ChatGPT` | Opens corresponding website |
-| `salir` / `adiós` / `terminar` | "Hasta luego, señor." and closes the assistant |
+| `qué puedes hacer` | Lista todos los comandos disponibles |
+| `abre Chrome` | Abre Google Chrome (si está instalado) |
+| `abre VS Code` / `abre Visual Studio Code` | Abre VS Code (si está instalado) |
+| `abre Spotify` | Abre Spotify (si está instalado) |
+| `abre YouTube` / `abre Google` / `abre GitHub` / `abre ChatGPT` | Abre el sitio web correspondiente |
+| `salir` / `adiós` / `terminar` | "Hasta luego, señor." y cierra el asistente |
 
-### Optional: Ollama Integration
-For advanced queries beyond basic commands, you can optionally use Ollama with the `mistral` model. If Ollama is unavailable, the assistant will respond with a friendly message and continue working with basic commands.
-*Note: Ollama is not required for basic functionality and is not recommended for low-memory PCs.*
+### Opcional: Integración con Ollama
+Para consultas avanzadas más allá de los comandos básicos, puedes usar opcionalmente Ollama con el modelo `mistral`. Si Ollama no está disponible, el asistente responderá con un mensaje amable y continuará funcionando con los comandos básicos.
+*Nota: Ollama no es necesario para la funcionalidad básica y no se recomienda para PCs con poca memoria.*
 
 ---
 
-## Quick Start (Local Version)
+## Inicio Rápido (Versión Local)
 
-### Prerequisites
+### Requisitos Previos
 - Python 3.11+
 - Windows 10/11
-- Microphone
-- Internet connection (for speech recognition and text-to-speech)
+- Micrófono funcional
+- Conexión a internet (para reconocimiento de voz y síntesis de voz)
 
-### Installation
-1. Clone the repository (if not already done):
+### Instalación
+1. Clona el repositorio (si no lo has hecho):
    ```bash
-   git clone https://github.com/yourusername/J.A.R.V.I.S.git
+   git clone https://github.com/tuusuario/J.A.R.V.I.S.git
    cd J.A.R.V.I.S
    ```
 
-2. Install required dependencies:
+2. Instala las dependencias necesarias:
    ```bash
    python -m pip install SpeechRecognition PyAudio requests edge-tts playsound==1.2.2
    ```
 
-### Run the Assistant
-1. Verify syntax:
+### Ejecución del Asistente
+1. Verifica la sintaxis:
    ```bash
    python -m py_compile local_friday.py
    ```
 
-2. Start the assistant:
+2. Inicia el asistente:
    ```bash
    python local_friday.py
    ```
 
-3. Speak naturally into your microphone using the commands listed above.
+3. Habla naturalmente al micrófono utilizando los comandos listados arriba.
 
 ---
 
-## Alternative: Cloud/API Version (Future Phase)
+## Alternativa: Versión Cloud/API (Fase Futura)
 
-The original F.R.I.D.A.Y. demo uses cloud APIs and LiveKit for a more advanced experience:
-- **FastMCP** server for tools/extensions
-- **LiveKit Agents** for real-time voice pipeline
+La versión original de F.R.I.D.A.Y. demo utiliza APIs de pago y LiveKit para una experiencia más avanzada:
+- **FastMCP** como servidor de herramientas/extensiones
+- **LiveKit Agents** para pipeline de voz en tiempo real
 - **Google Gemini** (LLM), **Sarvam** (STT), **OpenAI** (TTS)
 
-This version requires API keys and a LiveKit Cloud account, and is planned as a future phase. It is not the current active version.
+Esta versión requiere claves API y una cuenta en LiveKit Cloud, y está planificada como una fase futura. No es la versión activa actual.
 
-### Comparison: Local vs Cloud Version
-| Feature | Local Version (Active) | Cloud Version (Future) |
+### Comparativa: Versión Local vs Cloud
+| Característica | Versión Local (Activa) | Versión Cloud (Futura) |
 |---------|------------------------|------------------------|
-| Internet required | Yes (STT/TTS) | Yes (all components) |
-| Paid APIs | No | Yes (multiple) |
-| Privacy | Local processing (except STT/TTS) | Cloud processing |
-| Speed | Fast | Depends on network |
-| AI Quality | Basic commands + optional Ollama | High (Gemini LLM) |
-| Setup Time | ~5 minutes | ~30+ minutes |
-| Voice Recognition | Google Speech | Sarvam AI |
-| Voice Synthesis | edge-tts (Microsoft) | OpenAI TTS |
+| Requiere internet | Sí (STT/TTS) | Sí (todos los componentes) |
+| APIs de pago | No | Sí (múltiples) |
+| Privacidad | Procesamiento local (excepto STT/TTS) | Procesamiento en la nube |
+| Velocidad | Rápida | Depende de la red |
+| Calidad IA | Comandos básicos + Ollama opcional | Alta (Gemini LLM) |
+| Tiempo de configuración | ~5 minutos | ~30+ minutos |
+| Reconocimiento de voz | Google Speech | Sarvam AI |
+| Síntesis de voz | edge-tts (Microsoft) | OpenAI TTS |
 
-Refer to the original project documentation for setup details (note: this is not the current stable version).
+Consulta la documentación original del proyecto para detalles de configuración (nota: esta no es la versión estable actual).
 
 ---
 
-## Project Structure
+## Estructura del Proyecto
 ```
 J.A.R.V.I.S/
-├── local_friday.py       # Main local assistant script (active version)
-├── server.py             # FastMCP server (cloud version, future phase)
-├── agent_friday.py       # LiveKit voice agent (cloud version, future phase)
-├── pyproject.toml       # Project dependencies
-├── .env.example          # Environment variables template
-├── README.md            # This documentation
-├── LOCAL_GUIDE.md       # Quick local setup guide
-├── friday/              # Cloud version MCP package (future phase)
+├── local_friday.py       # Script principal del asistente local (versión activa)
+├── server.py             # Servidor FastMCP (versión cloud, fase futura)
+├── agent_friday.py       # Agente de voz LiveKit (versión cloud, fase futura)
+├── pyproject.toml       # Dependencias del proyecto
+├── .env.example         # Plantilla de variables de entorno
+├── README.md            # Esta documentación
+├── LOCAL_GUIDE.md       # Guía rápida de configuración local
+├── friday/              # Paquete MCP para versión cloud (fase futura)
 │   ├── config.py
 │   ├── tools/
 │   ├── prompts/
@@ -124,13 +124,13 @@ J.A.R.V.I.S/
 
 ---
 
-## Common Issues
-- **No voice output**: Verify `edge-tts` and `playsound==1.2.2` are installed correctly.
-- **Speech recognition fails**: Check internet connection and microphone settings.
-- **Ollama errors**: Ignore if using basic commands only; Ollama is optional.
-- **playsound errors**: Install the compatible version: `pip install playsound==1.2.2`
+## Problemas Comunes
+- **No hay salida de voz**: Verifica que `edge-tts` y `playsound==1.2.2` estén instalados correctamente.
+- **El reconocimiento de voz falla**: Revisa la conexión a internet y la configuración del micrófono.
+- **Errores de Ollama**: Ignóralos si solo usas comandos básicos; Ollama es opcional.
+- **Errores de playsound**: Instala la versión compatible: `pip install playsound==1.2.2`
 
 ---
 
-## License
+## Licencia
 MIT
