@@ -361,7 +361,67 @@ class LocalJARVIS:
                         console_response = f"Buscando {query} en YouTube, señor."
                         voice_response = "Buscando en YouTube, señor."
                         self.speak(console_response, voice_text=voice_response)
-                # 11. Abrir carpetas locales
+                # 11. Buscar en Google / imágenes
+                elif any(norm_text.startswith(p) for p in [
+                    "busca en google ",
+                    "buscame en google ",
+                    "busca en internet ",
+                    "busca informacion sobre ",
+                    "busca imagenes de ",
+                    "busca imagenes de ",
+                    "buscame imagenes de ",
+                    "buscame imagenes de ",
+                    "buscame ",
+                    "busca ",
+                ]):
+                    query = ""
+                    prefix_matched = ""
+                    # Detectar prefijo y extraer query
+                    prefixes = [
+                        "busca en google ",
+                        "buscame en google ",
+                        "busca en internet ",
+                        "busca informacion sobre ",
+                        "busca imagenes de ",
+                        "busca imagenes de ",
+                        "buscame imagenes de ",
+                        "buscame imagenes de ",
+                        "buscame ",
+                        "busca ",
+                    ]
+                    for p in prefixes:
+                        if norm_text.startswith(p):
+                            query = norm_text[len(p):].strip()
+                            prefix_matched = p
+                            break
+                    if not query:
+                        response = "No has especificado qué buscar, señor."
+                        self.speak(response)
+                    else:
+                        # Correcciones parciales de query
+                        query = query.replace("bits de drill", "beats drill")
+                        query = query.replace("bits drill", "beats drill")
+                        # Corrección flash + python/instalar
+                        if "flash" in query and ("python" in query or "instalar" in query):
+                            query = query.replace("flash", "flask")
+                        # Corrección de "flas" como palabra independiente
+                        words = query.split()
+                        words = ["flask" if word == "flas" else word for word in words]
+                        query = " ".join(words)
+                        
+                        encoded_query = urllib.parse.quote_plus(query)
+                        # Verificar si es búsqueda de imágenes
+                        if "imagenes de " in prefix_matched or "imagenes de " in prefix_matched:
+                            search_url = f"https://www.google.com/search?tbm=isch&q={encoded_query}"
+                            console_response = f"Buscando imágenes de {query}, señor."
+                            voice_response = "Buscando imágenes, señor."
+                        else:
+                            search_url = f"https://www.google.com/search?q={encoded_query}"
+                            console_response = f"Buscando {query} en Google, señor."
+                            voice_response = "Buscando en Google, señor."
+                        webbrowser.open(search_url)
+                        self.speak(console_response, voice_text=voice_response)
+                # 12. Abrir carpetas locales
                 elif "abre escritorio" in text:
                     path = r"C:\Users\anton\Desktop"
                     if os.path.exists(path):
