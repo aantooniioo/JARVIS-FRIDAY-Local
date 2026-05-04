@@ -83,7 +83,7 @@ class LocalJARVIS:
         self.listener = sr.Recognizer()
         self.memory_file = "friday_memory.json"
         self.activated = False
-
+        self.running = True
         
         print("[INIT] Sistema local cargado")
         print("[INIT] Escuchando en micrófono...")
@@ -202,6 +202,10 @@ class LocalJARVIS:
         """Limpia todos los recuerdos"""
         self.save_memory([])
     
+    def stop(self):
+        """Detiene el bucle principal"""
+        self.running = False
+
     def process_command(self, text, norm_text):
         """Procesa un comando y devuelve True si debe seguir, False si debe cerrar"""
         # Comandos simples
@@ -524,7 +528,7 @@ class LocalJARVIS:
         """Loop principal con modo activación"""
         print("\n[STANDBY] Esperando activación...")
         
-        while True:
+        while self.running:
             try:
                 text = self.listen()
                 
@@ -573,4 +577,5 @@ class LocalJARVIS:
 if __name__ == "__main__":
     jarvis = LocalJARVIS()
     jarvis.run()
+
 
