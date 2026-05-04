@@ -1,11 +1,16 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useRef, useState } from "react";
 import "./App.css";
 
 const API_URL = "http://localhost:8000";
+const WS_URL = "ws://localhost:8000/ws";
 
 function App() {
+  const previousRunning = useRef(null);
+  const socketRef = useRef(null);
+
   const [backendStatus, setBackendStatus] = useState(null);
   const [connected, setConnected] = useState(false);
+  const [wsConnected, setWsConnected] = useState(false);
   const [loading, setLoading] = useState(false);
   const [logs, setLogs] = useState([
     "[SISTEMA] Panel visual F.R.I.D.A.Y. iniciado.",
@@ -19,7 +24,7 @@ function App() {
       second: "2-digit",
     });
 
-    setLogs((prev) => [`[${time}] ${message}`, ...prev].slice(0, 12));
+    setLogs((prev) => [`[${time}] ${message}`, ...prev].slice(0, 14));
   };
 
   const fetchStatus = async () => {
@@ -36,7 +41,7 @@ function App() {
 
       setBackendStatus(data);
       setConnected(true);
-      addLog("[BACKEND] Estado recibido correctamente.");
+      addLog("[API] Estado recibido correctamente.");
     } catch (error) {
       setConnected(false);
       setBackendStatus(null);
@@ -59,7 +64,7 @@ function App() {
       }
 
       const data = await response.json();
-      addLog(`[FRIDAY] ${data.message || "Asistente iniciado."}`);
+      addLog(`[API] ${data.message || "Asistente iniciado."}`);
       await fetchStatus();
     } catch (error) {
       setConnected(false);
@@ -82,7 +87,7 @@ function App() {
       }
 
       const data = await response.json();
-      addLog(`[FRIDAY] ${data.message || "Asistente detenido."}`);
+      addLog(`[API] ${data.message || "Asistente detenido."}`);
       await fetchStatus();
     } catch (error) {
       setConnected(false);
@@ -94,6 +99,59 @@ function App() {
 
   useEffect(() => {
     fetchStatus();
+
+    const socket = new WebSocket(WS_URL);
+    socketRef.current = socket;
+
+    socket.onopen = () => {
+      setWsConnected(true);
+      setConnected(true);
+      addLog("[WS] Conexión en tiempo real establecida.");
+    };
+
+    socket.onmessage = (event) => {
+      try {
+        const eventData = JSON.parse(event.data);
+
+        if (eventData.type === "status_update") {
+          const data = eventData.data;
+          setBackendStatus(data);
+          setConnected(true);
+
+          if (previousRunning.current === null) {
+            previousRunning.current = data.running;
+            return;
+          }
+
+          if (previousRunning.current !== data.running) {
+            previousRunning.current = data.running;
+            addLog(
+              data.running
+                ? "[WS] Friday ha pasado a estado activo."
+                : "[WS] Friday ha vuelto a modo espera."
+            );
+          }
+        }
+      } catch (error) {
+        addLog("[ERROR] Evento WebSocket no válido.");
+      }
+    };
+
+    socket.onerror = () => {
+      setWsConnected(false);
+      addLog("[WS] Error en la conexión en tiempo real.");
+    };
+
+    socket.onclose = () => {
+      setWsConnected(false);
+      addLog("[WS] Conexión en tiempo real perdida.");
+    };
+
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.close();
+      }
+    };
   }, []);
 
   const assistantName = backendStatus?.assistant || "Friday";
@@ -122,6 +180,7 @@ function App() {
               <div className="ring ring-two" />
               <div className="ring ring-three" />
               <div className="scanner" />
+
               <div className="core-center">
                 <span>{running ? "ACTIVE" : "STANDBY"}</span>
               </div>
@@ -152,6 +211,11 @@ function App() {
               </div>
 
               <div className="status-row">
+                <span>WebSocket</span>
+                <strong>{wsConnected ? "Conectado" : "Desconectado"}</strong>
+              </div>
+
+              <div className="status-row">
                 <span>Running</span>
                 <strong>{running ? "True" : "False"}</strong>
               </div>
@@ -168,11 +232,11 @@ function App() {
               </button>
 
               <button onClick={startAssistant} disabled={loading}>
-                Start
+                Iniciar asistente
               </button>
 
               <button onClick={stopAssistant} disabled={loading}>
-                Stop
+                Detener
               </button>
             </div>
           </section>
@@ -180,8 +244,11 @@ function App() {
           <section className="log-card">
             <div className="log-header">
               <h2>Actividad</h2>
-              <button className="ghost-button" onClick={() => setLogs([])}>
-                Limpiar
+              <button
+                className="ghost-button"
+                onClick={() => setLogs(["[SISTEMA] Logs limpiados."])}
+              >
+                Limpiar logs
               </button>
             </div>
 
