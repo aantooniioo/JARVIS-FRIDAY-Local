@@ -64,7 +64,7 @@ class FridayGUI(QMainWindow):
         self.status_indicator.setStyleSheet("""
             QLabel {
                 font-size: 24px;
-                color: #FF5555;  # Rojo por defecto (inactivo)
+                color: #FF5555;
             }
         """)
         status_layout.addWidget(self.status_indicator)
@@ -167,7 +167,7 @@ class FridayGUI(QMainWindow):
         self.status_indicator.setStyleSheet("""
             QLabel {
                 font-size: 24px;
-                color: #00FF00;  /* Verde: activo */
+                color: #00FF00;
             }
         """)
         self.status_label.setText("Asistente activo")
