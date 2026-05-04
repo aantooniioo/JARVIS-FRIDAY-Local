@@ -1,5 +1,5 @@
-"""
-JARVIS Local - Versión offline basada en Friday pero 100% local
+﻿"""
+JARVIS Local - VersiÃ³n offline basada en Friday pero 100% local
 Usa Ollama + speech recognition + pyttsx3
 """
 
@@ -15,7 +15,7 @@ from pathlib import Path
 
 
 def normalize_text(text):
-    """Normaliza texto: minúsculas, sin acentos"""
+    """Normaliza texto: minÃºsculas, sin acentos"""
     if not text:
         return ""
     text = text.lower()
@@ -85,11 +85,11 @@ class LocalJARVIS:
         self.activated = False
 
         
-        print("[INIT] Componentes cargados")
+        print("[INIT] Sistema local cargado")
         print("[INIT] Escuchando en micrófono...")
-        print("[INIT] Conectando con Ollama en localhost:11434...\n")
+        print("[INIT] Modo activación listo\n")
         
-        self.speak("Friday inicializado")
+        self.speak("Sistema Friday iniciado. En espera, señor.")
     
     def speak(self, text: str, voice_text: str = None):
         """Habla usando edge-tts"""
@@ -139,7 +139,7 @@ class LocalJARVIS:
             return text.lower()
         
         except sr.UnknownValueError:
-            print("[ERROR] No se entendió el audio\n")
+            print("[ERROR] No se entendiÃ³ el audio\n")
             return None
         except sr.RequestError:
             print("[ERROR] Problema con Google Speech\n")
@@ -193,7 +193,7 @@ class LocalJARVIS:
             print(f"[ERROR MEMORIA] Error guardando memoria: {e}")
 
     def add_memory(self, text):
-        """Añade un nuevo recuerdo"""
+        """AÃ±ade un nuevo recuerdo"""
         memory = self.load_memory()
         memory.append(text)
         self.save_memory(memory)
@@ -206,7 +206,7 @@ class LocalJARVIS:
         """Procesa un comando y devuelve True si debe seguir, False si debe cerrar"""
         # Comandos simples
         # 1. Salir / terminar
-        if any(cmd in text for cmd in ["salir", "adiós", "terminar"]):
+        if any(cmd in text for cmd in ["salir", "adiÃ³s", "terminar"]):
             self.speak("Hasta luego, señor.")
             return False
         # 2. Hora
@@ -222,32 +222,32 @@ class LocalJARVIS:
         elif "qué puedes hacer" in text:
             response = ("Comandos disponibles: "
                 "'hora' para la hora, "
-                "'qué día es' / 'fecha' para la fecha, "
+                "'qué dÃ­a es' / 'fecha' para la fecha, "
                 "'hola Friday' para saludar, "
-                "'buenos días' / 'buenas tardes' / 'buenas noches' / 'gracias' / 'cómo estás' para cortesía, "
-                "'quién eres' / 'qué eres' para identidad, "
+                "'buenos días' / 'buenas tardes' / 'buenas noches' / 'gracias' / 'cómo estás' para cortesÃ­a, "
+                "'quiÃ©n eres' / 'qué eres' para identidad, "
                 "'abre Chrome' / 'abre VS Code' / 'abre Spotify' para aplicaciones, "
                 "'abre YouTube' / 'abre Google' / 'abre GitHub' / 'abre ChatGPT' para webs, "
                 "'abre escritorio' / 'abre descargas' / 'abre documentos' para carpetas, "
                 "'abre mi proyecto' / 'abre JARVIS' para abrir el proyecto local, "
-                "'busca música de [canción]' / 'busca [algo] en YouTube' para buscar música en YouTube, "
+                "'busca música de [canciÃ³n]' / 'busca [algo] en YouTube' para buscar música en YouTube, "
                 "'recuerda que [texto]' para guardar recuerdos, "
                 "'qué recuerdas' para leer recuerdos, "
                 "'borra recuerdos' / 'limpia memoria' para limpiar memoria, "
-                "'qué puedes hacer' para esta guía, "
-                "'salir' / 'adiós' / 'terminar' para cerrar. "
-                "Otras consultas usarán el modelo local si está disponible.")
+                "'qué puedes hacer' para esta guÃ­a, "
+                "'salir' / 'adiÃ³s' / 'terminar' para cerrar. "
+                "Otras consultas usarÃ¡n el modelo local si está disponible.")
             self.speak(response)
-        # 5. Fecha y día
-        elif any(cmd in text for cmd in ["qué día es", "fecha"]):
+        # 5. Fecha y dÃ­a
+        elif any(cmd in text for cmd in ["qué dÃ­a es", "fecha"]):
             today = datetime.now()
             days_es = {
                 0: "lunes",
                 1: "martes",
-                2: "miércoles",
+                2: "miÃ©rcoles",
                 3: "jueves",
                 4: "viernes",
-                5: "sábado",
+                5: "sÃ¡bado",
                 6: "domingo"
             }
             months_es = {
@@ -268,7 +268,7 @@ class LocalJARVIS:
             month_name = months_es[today.month]
             response = f"Hoy es {day_name}, {today.day} de {month_name} de {today.year}."
             self.speak(response)
-        # 6. Saludos y cortesía
+        # 6. Saludos y cortesÃ­a
         elif "buenos días" in text:
             response = "Buenos días, señor."
             self.speak(response)
@@ -285,7 +285,7 @@ class LocalJARVIS:
             response = "Operativa y lista para asistirle, señor."
             self.speak(response)
         # 7. Identidad
-        elif "quién eres" in text:
+        elif "quiÃ©n eres" in text:
             response = "Soy Fraidey, su asistente local."
             self.speak(response)
         elif "qué eres" in text:
@@ -371,7 +371,7 @@ class LocalJARVIS:
                 youtube_aliases = {
                     "central": "central cee",
                     "central si": "central cee",
-                    "central sí": "central cee",
+                    "central sÃ­": "central cee",
                     "central c": "central cee",
                     "beny": "beny jr",
                     "beni jr": "beny jr",
@@ -438,16 +438,16 @@ class LocalJARVIS:
                 # Correcciones parciales de query
                 query = query.replace("bits de drill", "beats drill")
                 query = query.replace("bits drill", "beats drill")
-                # Corrección flash + python/instalar
+                # CorrecciÃ³n flash + python/instalar
                 if "flash" in query and ("python" in query or "instalar" in query):
                     query = query.replace("flash", "flask")
-                # Corrección de "flas" como palabra independiente
+                # CorrecciÃ³n de "flas" como palabra independiente
                 words = query.split()
                 words = ["flask" if word == "flas" else word for word in words]
                 query = " ".join(words)
                 
                 encoded_query = urllib.parse.quote_plus(query)
-                # Verificar si es búsqueda de imágenes
+                # Verificar si es bÃºsqueda de imágenes
                 if "imagenes de " in prefix_matched or "imagenes de " in prefix_matched:
                     search_url = f"https://www.google.com/search?tbm=isch&q={encoded_query}"
                     console_response = f"Buscando imágenes de {query}, señor."
@@ -496,7 +496,7 @@ class LocalJARVIS:
             memory_text = text.split("recuerda que", 1)[1].strip()
             if memory_text:
                 self.add_memory(memory_text)
-                response = "Lo recordaré, señor."
+                response = "Lo recordarÃ©, señor."
             else:
                 response = "No has especificado qué recordar, señor."
             self.speak(response)
@@ -536,7 +536,7 @@ class LocalJARVIS:
                 # Si no está activado: solo esperar activación
                 if not self.activated:
                     if is_activation(norm_text):
-                        # Activación detectada
+                        # ActivaciÃ³n detectada
                         # Quitar frase de activación
                         command_text = remove_activation(text)
                         command_norm = normalize_text(command_text)
@@ -573,3 +573,4 @@ class LocalJARVIS:
 if __name__ == "__main__":
     jarvis = LocalJARVIS()
     jarvis.run()
+
